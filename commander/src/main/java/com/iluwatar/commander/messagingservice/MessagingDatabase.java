@@ -1,6 +1,8 @@
-/**
+/*
+ * This project is licensed under the MIT license. Module model-view-viewmodel is using ZK framework licensed under LGPL (see lgpl-3.0.txt).
+ *
  * The MIT License
- * Copyright (c) 2014-2016 Ilkka Sepp�l�
+ * Copyright © 2014-2022 Ilkka Seppälä
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,33 +22,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package com.iluwatar.commander.messagingservice;
 
-import java.util.Hashtable;
 import com.iluwatar.commander.Database;
-import com.iluwatar.commander.exceptions.DatabaseUnavailableException;
 import com.iluwatar.commander.messagingservice.MessagingService.MessageRequest;
+import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * The MessagingDatabase is where the MessageRequest is added.
  */
 
 public class MessagingDatabase extends Database<MessageRequest> {
-  private Hashtable<String, MessageRequest> data;
+  private final Map<String, MessageRequest> data = new Hashtable<>();
 
-  public MessagingDatabase() {
-    this.data = new Hashtable<String, MessageRequest>();
+  @Override
+  public MessageRequest add(MessageRequest r) {
+    return data.put(r.reqId(), r);
   }
 
   @Override
-  public MessageRequest add(MessageRequest r) throws DatabaseUnavailableException {
-    return data.put(r.reqId, r);
-  }
-
-  @Override
-  public MessageRequest get(String rId) throws DatabaseUnavailableException {
-    return data.get(rId);
+  public MessageRequest get(String requestId) {
+    return data.get(requestId);
   }
 
 }

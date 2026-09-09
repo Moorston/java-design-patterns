@@ -14,10 +14,22 @@ public class TokenBucketRateLimiter implements RateLimiter {
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
   public TokenBucketRateLimiter(int capacity, int refillRate) {
+    this(capacity, refillRate, 1, TimeUnit.SECONDS);
+  }
+
+  /**
+   * Constructor with custom refill interval.
+   *
+   * @param capacity token bucket capacity
+   * @param refillRate token refill rate
+   * @param refillInterval refill interval value
+   * @param timeUnit refill interval time unit
+   */
+  public TokenBucketRateLimiter(
+      int capacity, int refillRate, long refillInterval, TimeUnit timeUnit) {
     this.capacity = capacity;
     this.refillRate = refillRate;
-    // Refill tokens in all buckets every second
-    scheduler.scheduleAtFixedRate(this::refillBuckets, 1, 1, TimeUnit.SECONDS);
+    scheduler.scheduleAtFixedRate(this::refillBuckets, refillInterval, refillInterval, timeUnit);
   }
 
   @Override
@@ -60,5 +72,9 @@ public class TokenBucketRateLimiter implements RateLimiter {
     void refill(int amount) {
       tokens.getAndUpdate(current -> Math.min(current + amount, capacity));
     }
+  }
+
+  public void shutdown() {
+    scheduler.shutdown();
   }
 }
